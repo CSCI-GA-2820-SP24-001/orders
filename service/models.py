@@ -28,8 +28,8 @@ class Orders(db.Model):
     # Table Schema
     ##################################################
     order_id: int = db.Column(db.Integer, primary_key=True)
-    customer_id: int = db.Column(db.Integer)
-    order_date: datetime = db.Column(db.DateTime)
+    customer_id: int = db.Column(db.Integer, nullable=False)
+    order_date: datetime = db.Column(db.DateTime, default=datetime.utcnow)
     status: str = db.Column(
         Enum(
             "pending",
@@ -78,7 +78,7 @@ class Orders(db.Model):
             db.session.rollback()
             logger.error("Error updating record: %s", self)
             raise DataValidationError(e) from e
-
+        
     def delete(self):
         """Removes a Order from the data store"""
         logger.info("Deleting %s", self.order_id)
@@ -114,8 +114,6 @@ class Orders(db.Model):
             self.status: str = data["status"]
             self.tracking_number: str = data["tracking_number"]
             self.discount_amount: float = data["discount_amount"]
-        except AttributeError as error:
-            raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:
             raise DataValidationError(
                 "Invalid YourResourceModel: missing " + error.args[0]
@@ -185,7 +183,7 @@ class OrderItems(db.Model):
     ##################################################
     order_item_id: int = db.Column(db.Integer, primary_key=True)
     order_id: int = db.Column(db.Integer, db.ForeignKey("orders.order_id"))
-    product_id: int = db.Column(db.Integer)
+    product_id: int = db.Column(db.Integer, nullable=False)
     quantity: int = db.Column(db.Integer)
     price: float = db.Column(db.Float)
 
@@ -250,8 +248,6 @@ class OrderItems(db.Model):
             self.product_id: int = data["product_id"]
             self.quantity: int = data["quantity"]
             self.price: float = data["price"]
-        except AttributeError as error:
-            raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:
             raise DataValidationError(
                 "Invalid OrderItem: missing " + error.args[0]

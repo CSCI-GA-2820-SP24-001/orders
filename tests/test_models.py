@@ -6,7 +6,7 @@ import os
 import logging
 from unittest import TestCase
 from wsgi import app
-from service.models import Orders, OrderItems, db
+from service.models import DataValidationError, Orders, OrderItems, db
 from tests.factories import OrdersFactory, OrderItemsFactory
 
 DATABASE_URI = os.getenv(
@@ -49,6 +49,9 @@ class TestOrdersModel(TestCase):
         order = OrdersFactory()
         order.create()
         self.assertIsNotNone(order.order_id)
+        order = OrdersFactory(customer_id=None)
+        with self.assertRaises(DataValidationError):
+            order.create()
 
     def test_update_order(self):
         """test_update_order"""
@@ -57,6 +60,9 @@ class TestOrdersModel(TestCase):
         order.status = "processing"
         order.update()
         self.assertEqual(order.status, "processing")
+        order.customer_id = None
+        with self.assertRaises(DataValidationError):
+            order.update()
 
     def test_delete_order(self):
         """test_delete_order"""
@@ -67,6 +73,11 @@ class TestOrdersModel(TestCase):
         order.delete()
         found = Orders.query.all()
         self.assertEqual(len(found), 0)
+        order = OrdersFactory()
+        order.create()
+        order.order_id = None
+        with self.assertRaises(DataValidationError):
+            order.delete()
 
     def test_serialize_order(self):
         """test_serialize_order"""
@@ -81,6 +92,12 @@ class TestOrdersModel(TestCase):
         new_order = Orders()
         new_order.deserialize(data)
         self.assertEqual(new_order.customer_id, order.customer_id)
+        data = {}  # This will cause a KeyError
+        with self.assertRaises(DataValidationError):
+            new_order.deserialize(data)
+        data = "not a dict"  # This will cause a TypeError
+        with self.assertRaises(DataValidationError):
+            new_order.deserialize(data)
 
     def test_list_all_orders(self):
         """test_list_all_orders"""
@@ -116,6 +133,8 @@ class TestOrdersModel(TestCase):
         order_data = {"status": "processing"}
         updated_order = Orders.update_order(order.order_id, order_data)
         self.assertEqual(updated_order.status, "processing")
+        order = Orders.update_order(updated_order.order_id+1, order_data)
+        assert order is None
 
     def test_delete_order_method(self):
         """test_delete_order_method"""
@@ -126,7 +145,14 @@ class TestOrdersModel(TestCase):
         Orders.delete_order(order.order_id)
         found = Orders.query.all()
         self.assertEqual(len(found), 0)
+        order = Orders.delete_order(1)
+        assert order is None
 
+    def test_order_repr(self):
+        """test_order_repr"""
+        order = OrdersFactory()
+        order.create()
+        self.assertEqual(str(order), f"<Order id=[{order.order_id}]>")
 
 class TestOrderItemsModel(TestCase):
     """TestOrderItemsModel"""
@@ -165,6 +191,9 @@ class TestOrderItemsModel(TestCase):
         item = OrderItemsFactory(order_id=order.order_id)
         item.create()
         self.assertIsNotNone(item.order_item_id)
+        item = OrderItemsFactory(order_id=order.order_id, product_id=None)
+        with self.assertRaises(DataValidationError):
+            item.create()
 
     def test_update_item(self):
         """test_update_item"""
@@ -175,6 +204,9 @@ class TestOrderItemsModel(TestCase):
         item.price = 10.0
         item.update()
         self.assertEqual(item.price, 10.0)
+        item.product_id = None
+        with self.assertRaises(DataValidationError):
+            item.update()
 
     def test_delete_item(self):
         """test_delete_item"""
@@ -187,6 +219,10 @@ class TestOrderItemsModel(TestCase):
         item.delete()
         found = OrderItems.query.all()
         self.assertEqual(len(found), 0)
+        item = OrderItemsFactory(order_id=order.order_id)
+        with self.assertRaises(DataValidationError):
+            item.delete()
+        
 
     def test_serialize_item(self):
         """test_serialize_item"""
@@ -201,6 +237,12 @@ class TestOrderItemsModel(TestCase):
         new_item = OrderItems()
         new_item.deserialize(data)
         self.assertEqual(new_item.product_id, item.product_id)
+        data = {}  # This will cause a KeyError
+        with self.assertRaises(DataValidationError):
+            new_item.deserialize(data)
+        data = "not a dict"  # This will cause a TypeError
+        with self.assertRaises(DataValidationError):
+            new_item.deserialize(data)
 
     def test_find_by_order(self):
         """test_find_by_order"""
@@ -246,6 +288,12 @@ class TestOrderItemsModel(TestCase):
             item.order_id, item.order_item_id, item_data
         )
         self.assertEqual(updated_item.quantity, 2)
+        item = OrderItems.update_item_in_order(updated_item.order_id+1, updated_item.order_item_id, item_data)
+        assert item is None
+        item = OrderItems.update_item_in_order(updated_item.order_id, updated_item.order_item_id+1, item_data)
+        assert item is None
+        item = OrderItems.update_item_in_order(updated_item.order_id+1, updated_item.order_item_id+1, item_data)
+        assert item is None
 
     def test_delete_item_from_order(self):
         """test_delete_item_from_order"""
@@ -258,3 +306,20 @@ class TestOrderItemsModel(TestCase):
         OrderItems.delete_item_from_order(item.order_id, item.order_item_id)
         found = OrderItems.query.all()
         self.assertEqual(len(found), 0)
+        item_test = OrderItems.delete_item_from_order(item.order_id, item.order_item_id)
+        assert item_test is None
+        item_test = OrderItems.delete_item_from_order(item.order_id+1, item.order_item_id)
+        assert item_test is None
+        item_test = OrderItems.delete_item_from_order(item.order_id, item.order_item_id+1)
+        assert item_test is None
+        item_test = OrderItems.delete_item_from_order(item.order_id+1, item.order_item_id+1)
+        assert item_test is None
+    
+    def test_item_repr(self):
+        """test_item_repr"""
+        order = OrdersFactory()
+        order.create()
+        item = OrderItemsFactory(order_id=order.order_id)
+        item.create()
+        self.assertEqual(str(item), f"<OrderItem id=[{item.order_item_id}]>")
+

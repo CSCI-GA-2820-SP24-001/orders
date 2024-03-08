@@ -11,14 +11,14 @@ from service.common.cli_commands import db_create  # noqa: E402
 
 
 class TestFlaskCLI(TestCase):
-    """Flask CLI Command Tests"""
+    """TestFlaskCLI"""
 
     def setUp(self):
         self.runner = CliRunner()
 
     @patch('service.common.cli_commands.db')
     def test_db_create(self, db_mock):
-        """It should call the db-create command"""
+        """test_db_create"""
         db_mock.return_value = MagicMock()
         with patch.dict(os.environ, {"FLASK_APP": "wsgi:app"}, clear=True):
             result = self.runner.invoke(db_create)
