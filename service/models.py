@@ -43,8 +43,8 @@ class Orders(db.Model):
         ),
         default="pending",
     )
-    tracking_number: str = db.Column(db.String)
-    discount_amount: float = db.Column(db.Float)
+    tracking_number: str|None  = db.Column(db.String, nullable=True)
+    discount_amount: float = db.Column(db.Float, default=0.0)
     # Relationship to OrderItems
     order_items = db.relationship(
         "OrderItems", backref="orders", cascade="all, delete-orphan"
@@ -110,10 +110,10 @@ class Orders(db.Model):
         """
         try:
             self.customer_id: int = data["customer_id"]
-            self.order_date: datetime = datetime.fromisoformat(data["order_date"])
-            self.status: str = data["status"]
-            self.tracking_number: str = data["tracking_number"]
-            self.discount_amount: float = data["discount_amount"]
+            self.order_date: datetime = datetime.fromisoformat(data.get("order_date", datetime.utcnow().isoformat()))
+            self.status: str = data.get("status", "pending")
+            self.tracking_number: str|None = data.get("tracking_number", None)
+            self.discount_amount: float = data.get("discount_amount", 0.0)
         except KeyError as error:
             raise DataValidationError(
                 "Invalid YourResourceModel: missing " + error.args[0]

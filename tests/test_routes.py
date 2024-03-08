@@ -9,6 +9,7 @@ from wsgi import app
 from service.common import status
 
 from service.models import Orders, OrderItems, db
+from tests.factories import OrdersFactory, OrderItemsFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
@@ -19,8 +20,8 @@ DATABASE_URI = os.getenv(
 #  T E S T   C A S E S
 ######################################################################
 # pylint: disable=too-many-public-methods
-class TestOrdersService(TestCase):
-    """TestOrdersService"""
+class TestRoutesService(TestCase):
+    """TestRoutesService"""
 
     @classmethod
     def setUpClass(cls):
@@ -40,6 +41,7 @@ class TestOrdersService(TestCase):
     def setUp(self):
         """Runs before each test"""
         self.client = app.test_client()
+        db.session.query(OrderItems).delete()  # clean up the last tests
         db.session.query(Orders).delete()  # clean up the last tests
         db.session.commit()
 
@@ -55,5 +57,48 @@ class TestOrdersService(TestCase):
         """test_index"""
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-
+        
+    def test_create_order(self):
+        """test_create_order"""
+        # Create a order
+        resp = self.client.post("/orders", json={"customer_id":1})
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(resp.json["customer_id"], 1)
+        # Create a order with status
+        resp = self.client.post("/orders", json={"customer_id":2,"status":"shipped"})
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(resp.json["status"], "shipped")
+        self.assertEqual(resp.json["customer_id"], 2)
+        # Create a order with tracking number
+        resp = self.client.post("/orders", json={"customer_id":3,"tracking_number":"1234"})
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(resp.json["tracking_number"], "1234")
+        self.assertEqual(resp.json["customer_id"], 3)
+        # Create a order with discount amount
+        resp = self.client.post("/orders", json={"customer_id":4,"discount_amount":10.00})
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(resp.json["discount_amount"], 10.00)
+        self.assertEqual(resp.json["customer_id"], 4)
+        # Create a order with all fields
+        resp = self.client.post("/orders", json={"customer_id":5,"status":"processing","tracking_number":"123456","discount_amount":100.00})
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(resp.json["status"], "processing")
+        self.assertEqual(resp.json["tracking_number"], "123456")
+        self.assertEqual(resp.json["discount_amount"], 100.00)
+        self.assertEqual(resp.json["customer_id"], 5)
+        # Create a order with no customer_id
+        resp = self.client.post("/orders", json={})
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        # Create a order with invalid status
+        resp = self.client.post("/orders", json={"customer_id":6,"status":"invalid"})
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        # Create a order with invalid discount amount
+        resp = self.client.post("/orders", json={"customer_id":7,"discount_amount":"invalid"})
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        # Create a order with invalid customer_id
+        resp = self.client.post("/orders", json={"customer_id":"invalid"})
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        # Create a order with invalid json
+        resp = self.client.post("/orders", data="invalid")
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
     # Todo: Add your test cases here...
