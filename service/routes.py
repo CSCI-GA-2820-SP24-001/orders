@@ -43,4 +43,24 @@ def index():
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
 
-# Todo: Place your REST API code here ...
+@app.route('/orders', methods=['POST'])
+def create_order():
+    """Create a new order.
+
+    This function creates a new order based on the JSON data provided in the request.
+
+    Returns:
+        A JSON response containing the serialized representation of the newly created order.
+
+    Raises:
+        Exception: If there is an error while creating the order.
+
+    """
+    
+    try:
+        new_order = Orders.create_new(request.json)
+        response = jsonify(new_order.serialize())
+        response.status_code = 201
+        return response
+    except Exception as e:
+        return {'error': str(e)}, 400

@@ -174,6 +174,7 @@ class TestOrderItemsModel(TestCase):
     def setUp(self):
         """This runs before each test"""
         db.session.query(OrderItems).delete()  # clean up the last tests
+        db.session.query(Orders).delete()  # clean up the last tests
         db.session.commit()
 
     def tearDown(self):
