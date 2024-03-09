@@ -23,7 +23,7 @@ and Delete Pets from the inventory of pets in the PetShop
 
 from flask import jsonify, request, url_for, abort
 from flask import current_app as app  # Import Flask application
-from service.models import Orders
+from service.models import OrderItems, Orders
 from service.common import status  # HTTP Status Codes
 
 
@@ -60,6 +60,29 @@ def create_order():
     try:
         new_order = Orders.create_new(request.json)
         response = jsonify(new_order.serialize())
+        response.status_code = 201
+        return response
+    except Exception as e:
+        return {'error': str(e)}, 400
+
+@app.route('/orders/<int:order_id>/items', methods=['POST'])
+def add_item_to_order(order_id:int):
+    """Add an item to an order.
+
+    This function adds a new item to the order with the specified ID.
+
+    Args:
+        id (int): The ID of the order.
+
+    Returns:
+        dict: A dictionary containing the serialized representation of the newly created item.
+
+    Raises:
+        Exception: If there is an error while adding the item to the order.
+    """
+    try:
+        new_item = OrderItems.create_item(order_id, request.json)
+        response = jsonify(new_item.serialize())
         response.status_code = 201
         return response
     except Exception as e:

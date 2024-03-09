@@ -184,8 +184,8 @@ class OrderItems(db.Model):
     order_item_id: int = db.Column(db.Integer, primary_key=True)
     order_id: int = db.Column(db.Integer, db.ForeignKey("orders.order_id"))
     product_id: int = db.Column(db.Integer, nullable=False)
-    quantity: int = db.Column(db.Integer)
-    price: float = db.Column(db.Float)
+    quantity: int = db.Column(db.Integer, nullable=False)
+    price: float = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
         return f"<OrderItem id=[{self.order_item_id}]>"
