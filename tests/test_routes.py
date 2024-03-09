@@ -101,4 +101,38 @@ class TestRoutesService(TestCase):
         # Create a order with invalid json
         resp = self.client.post("/orders", data="invalid")
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-    # Todo: Add your test cases here...
+    
+    def test_add_item_to_order(self):
+        resp = self.client.post("/orders", json={"customer_id":5,"status":"processing","tracking_number":"123456","discount_amount":100.00})
+        order_id = resp.json["order_id"]
+        # Add an item to the order
+        resp = self.client.post(f'/orders/{order_id}/items', json={"product_id": 1, "quantity": 1, "price": 10.00})
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(resp.json["product_id"], 1)
+        self.assertEqual(resp.json["quantity"], 1)
+        self.assertEqual(resp.json["price"], 10.00)
+        # Add an item to the order with no product_id
+        resp = self.client.post(f'/orders/{order_id}/items', json={"quantity": 1, "price": 10.00})
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        # Add an item to the order with no quantity
+        resp = self.client.post(f'/orders/{order_id}/items', json={"product_id": 1, "price": 10.00})
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        # Add an item to the order with no price
+        resp = self.client.post(f'/orders/{order_id}/items', json={"product_id": 1, "quantity": 1})
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        # Add an item to the order with invalid product_id
+        resp = self.client.post(f'/orders/{order_id}/items', json={"product_id": "invalid", "quantity": 1, "price": 10.00})
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        # Add an item to the order with invalid quantity
+        resp = self.client.post(f'/orders/{order_id}/items', json={"product_id": 1, "quantity": "invalid", "price": 10.00})
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        # Add an item to the order with invalid price
+        resp = self.client.post(f'/orders/{order_id}/items', json={"product_id": 1, "quantity": 1, "price": "invalid"})
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        # Add an item to the order with invalid json
+        resp = self.client.post(f'/orders/{order_id}/items', data="invalid")
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        # Add an item to the order with non-existent order_id
+        resp = self.client.post(f'/orders/9999999/items', json={"product_id": 1, "quantity": 1, "price": 10.00})
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        
