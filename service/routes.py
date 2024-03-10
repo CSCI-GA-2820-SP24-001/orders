@@ -121,6 +121,22 @@ def get_items_in_order(order_id):
     response.status_code = 200
     return response
 
+@app.route("/orders/<int:order_id>", methods=["GET"])
+def get_order(order_id):
+    """
+    Retrieve a single order.
+    Args:
+        order_id (int): The ID of the order.
+    Returns:
+        dict: A dictionary containing the serialized order if found, or an error message if not found.
+    """
+    order = Orders.find(order_id)
+    if not order:
+        return {'error': 'Order not found'}, 404
+    response = jsonify(order.serialize())
+    response.status_code = 200
+    return response
+
 @app.route("/orders/<int:order_id>", methods=["DELETE"])
 def delete_order(order_id):
     """
