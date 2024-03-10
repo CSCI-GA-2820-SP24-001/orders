@@ -88,6 +88,23 @@ def add_item_to_order(order_id:int):
     except Exception as e:
         return {'error': str(e)}, 400
 
+@app.route('/orders/<int:order_id>/items/<int:item_id>', methods=['GET'])
+def get_item_in_order(order_id, item_id):
+    """
+    Retrieve a specific item in an order.
+    Args:
+        order_id (int): The ID of the order.
+        item_id (int): The ID of the item.
+    Returns:
+        dict: A dictionary containing the serialized item if found, or an error message if not found.
+    """
+    item = OrderItems.find_item_in_order(order_id, item_id)
+    if not item:
+        return {'error': 'Item not found'}, 404
+    response = jsonify(item.serialize())
+    response.status_code = 200
+    return response
+
 @app.route("/orders/<int:order_id>", methods=["DELETE"])
 def delete_order(order_id):
     """
