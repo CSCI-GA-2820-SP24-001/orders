@@ -137,6 +137,33 @@ class TestRoutesService(TestCase):
         resp = self.client.post(f'/orders/9999999/items', json={"product_id": 1, "quantity": 1, "price": 10.00})
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
+        def test_get_single_item_in_order(self):
+        """test_get_single_item_in_order"""
+        # Create a new order
+        resp = self.client.post("/orders", json={"customer_id":1})
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        order_id = resp.json["order_id"]
+
+        # Add an item to the order
+        resp = self.client.post(f'/orders/{order_id}/items', json={"product_id": 1, "quantity": 1, "price": 10.00})
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        item_id = resp.json["order_item_id"]
+
+        # Get the item from the order
+        resp = self.client.get(f'/orders/{order_id}/items/{item_id}')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.json['order_item_id'], item_id)
+        self.assertEqual(resp.json['product_id'], 1)
+        self.assertEqual(resp.json['quantity'], 1)
+        self.assertEqual(resp.json['price'], 10.00)
+
+        # Try to get a non-existent item from the order
+        resp = self.client.get(f'/orders/{order_id}/items/9999999')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Try to get an item from a non-existent order
+        resp = self.client.get(f'/orders/9999999/items/{item_id}')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
     def test_delete_order(self):
         """test_delete_order"""
         # Create a new order
