@@ -87,3 +87,22 @@ def add_item_to_order(order_id:int):
         return response
     except Exception as e:
         return {'error': str(e)}, 400
+
+@app.route("/orders/<int:order_id>", methods=["DELETE"])
+def delete_order(order_id):
+    """
+    Delete an order.
+
+    Args:
+        order_id (int): The ID of the order.
+
+    Returns:
+        dict: A dictionary containing a success message if deleted, or an error message if not found.
+
+    """
+    order = Orders.delete_order(order_id)
+    if not order:
+        return {'error': 'Order not found'}, 404
+    response = jsonify({'message': 'Order successfully deleted'})
+    response.status_code = 200
+    return response
