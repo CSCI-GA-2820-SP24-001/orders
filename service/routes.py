@@ -149,6 +149,22 @@ def list_orders():
     response.status_code = 200
     return response
 
+@app.route("/orders/<int:order_id>", methods=["PUT"])
+def update_order(order_id):
+    """
+    Update an order.
+    Args:
+        order_id (int): The ID of the order.
+    Returns:
+        dict: A dictionary containing the serialized order if updated, or an error message if not found.
+    """
+    order = Orders.update_order(order_id, request.json)
+    if not order:
+        return {'error': 'Order not found'}, 404
+    response = jsonify(order.serialize())
+    response.status_code = 200
+    return response
+
 @app.route("/orders/<int:order_id>", methods=["DELETE"])
 def delete_order(order_id):
     """
