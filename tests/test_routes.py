@@ -227,6 +227,22 @@ class TestRoutesService(TestCase):
         self.assertEqual(resp.json[1]['customer_id'], 2)
         self.assertEqual(resp.json[2]['customer_id'], 3)
 
+    def test_update_order(self):
+        """test_update_order"""
+        # Create a new order
+        resp = self.client.post("/orders", json={"customer_id":1})
+        order_id = resp.json["order_id"]
+
+        # Update the order
+        resp = self.client.put(f'/orders/{order_id}', json={"customer_id":2})
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.json['order_id'], order_id)
+        self.assertEqual(resp.json['customer_id'], 2)
+
+        # Try to update a non-existent order
+        resp = self.client.put('/orders/9999999', json={"customer_id":3})
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_delete_order(self):
         """test_delete_order"""
         # Create a new order
