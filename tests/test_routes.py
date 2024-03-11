@@ -208,6 +208,25 @@ class TestRoutesService(TestCase):
         resp = self.client.get('/orders/9999999')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         
+    def test_list_orders(self):
+        """test_list_orders"""
+        resp = self.client.get("/orders")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(resp.json), 0)
+
+        # Create some orders
+        self.client.post("/orders", json={"customer_id":1})
+        self.client.post("/orders", json={"customer_id":2})
+        self.client.post("/orders", json={"customer_id":3})
+
+        # Get all orders
+        resp = self.client.get("/orders")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(resp.json), 3)
+        self.assertEqual(resp.json[0]['customer_id'], 1)
+        self.assertEqual(resp.json[1]['customer_id'], 2)
+        self.assertEqual(resp.json[2]['customer_id'], 3)
+
     def test_delete_order(self):
         """test_delete_order"""
         # Create a new order
