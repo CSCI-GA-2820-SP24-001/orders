@@ -137,6 +137,18 @@ def get_order(order_id):
     response.status_code = 200
     return response
 
+@app.route("/orders", methods=["GET"])
+def list_orders():
+    """
+    List all orders.
+    Returns:
+        dict: A dictionary containing the serialized orders.
+    """
+    orders = Orders.list_all()
+    response = jsonify([order.serialize() for order in orders])
+    response.status_code = 200
+    return response
+
 @app.route("/orders/<int:order_id>", methods=["DELETE"])
 def delete_order(order_id):
     """
