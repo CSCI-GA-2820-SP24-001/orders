@@ -43,7 +43,7 @@ class Orders(db.Model):
         ),
         default="pending",
     )
-    tracking_number: str|None  = db.Column(db.String, nullable=True)
+    tracking_number: str | None = db.Column(db.String, nullable=True)
     discount_amount: float = db.Column(db.Float, default=0.0)
     # Relationship to OrderItems
     order_items = db.relationship(
@@ -78,7 +78,7 @@ class Orders(db.Model):
             db.session.rollback()
             logger.error("Error updating record: %s", self)
             raise DataValidationError(e) from e
-        
+
     def delete(self):
         """Removes a Order from the data store"""
         logger.info("Deleting %s", self.order_id)
@@ -110,9 +110,11 @@ class Orders(db.Model):
         """
         try:
             self.customer_id: int = data["customer_id"]
-            self.order_date: datetime = datetime.fromisoformat(data.get("order_date", datetime.utcnow().isoformat()))
+            self.order_date: datetime = datetime.fromisoformat(
+                data.get("order_date", datetime.utcnow().isoformat())
+            )
             self.status: str = data.get("status", "pending")
-            self.tracking_number: str|None = data.get("tracking_number", None)
+            self.tracking_number: str | None = data.get("tracking_number", None)
             self.discount_amount: float = data.get("discount_amount", 0.0)
         except KeyError as error:
             raise DataValidationError(

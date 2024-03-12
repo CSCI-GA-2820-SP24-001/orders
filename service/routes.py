@@ -21,9 +21,9 @@ This service implements a REST API that allows you to Create, Read, Update
 and Delete Pets from the inventory of pets in the PetShop
 """
 
-from flask import jsonify, request, url_for, abort
+from flask import jsonify, request
 from flask import current_app as app  # Import Flask application
-from service.models import OrderItems, Orders
+from service.models import OrderItems, Orders, DataValidationError
 from service.common import status  # HTTP Status Codes
 
 
@@ -32,7 +32,7 @@ from service.common import status  # HTTP Status Codes
 ######################################################################
 @app.route("/")
 def index():
-    """ Root URL response """
+    """Root URL response"""
     return (
         "Reminder: return some useful information in json format about the service here",
         status.HTTP_200_OK,
@@ -43,7 +43,8 @@ def index():
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
 
-@app.route('/orders', methods=['POST'])
+
+@app.route("/orders", methods=["POST"])
 def create_order():
     """Create a new order.
 
@@ -56,17 +57,18 @@ def create_order():
         Exception: If there is an error while creating the order.
 
     """
-    
+
     try:
         new_order = Orders.create_new(request.json)
         response = jsonify(new_order.serialize())
         response.status_code = 201
         return response
-    except Exception as e:
-        return {'error': str(e)}, 400
+    except DataValidationError as e:
+        return {"error": str(e)}, 400
 
-@app.route('/orders/<int:order_id>/items', methods=['POST'])
-def add_item_to_order(order_id:int):
+
+@app.route("/orders/<int:order_id>/items", methods=["POST"])
+def add_item_to_order(order_id: int):
     """Add an item to an order.
 
     This function adds a new item to the order with the specified ID.
@@ -85,10 +87,11 @@ def add_item_to_order(order_id:int):
         response = jsonify(new_item.serialize())
         response.status_code = 201
         return response
-    except Exception as e:
-        return {'error': str(e)}, 400
+    except DataValidationError as e:
+        return {"error": str(e)}, 400
 
-@app.route('/orders/<int:order_id>/items/<int:item_id>', methods=['GET'])
+
+@app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["GET"])
 def get_item_in_order(order_id, item_id):
     """
     Retrieve a specific item in an order.
@@ -103,10 +106,11 @@ def get_item_in_order(order_id, item_id):
     """
     item = OrderItems.find_item_in_order(order_id, item_id)
     if not item:
-        return {'error': 'Item not found'}, 404
+        return {"error": "Item not found"}, 404
     response = jsonify(item.serialize())
     response.status_code = 200
     return response
+
 
 @app.route("/orders/<int:order_id>/items", methods=["GET"])
 def get_items_in_order(order_id):
@@ -122,10 +126,11 @@ def get_items_in_order(order_id):
     """
     items = OrderItems.find_by_order(order_id)
     if not items:
-        return {'error': 'No items found for this order'}, 404
+        return {"error": "No items found for this order"}, 404
     response = jsonify([item.serialize() for item in items])
     response.status_code = 200
     return response
+
 
 @app.route("/orders/<int:order_id>", methods=["GET"])
 def get_order(order_id):
@@ -141,10 +146,11 @@ def get_order(order_id):
     """
     order = Orders.find(order_id)
     if not order:
-        return {'error': 'Order not found'}, 404
+        return {"error": "Order not found"}, 404
     response = jsonify(order.serialize())
     response.status_code = 200
     return response
+
 
 @app.route("/orders", methods=["GET"])
 def list_orders():
@@ -160,6 +166,7 @@ def list_orders():
     response.status_code = 200
     return response
 
+
 @app.route("/orders/<int:order_id>", methods=["PUT"])
 def update_order(order_id):
     """
@@ -174,10 +181,11 @@ def update_order(order_id):
     """
     order = Orders.update_order(order_id, request.json)
     if not order:
-        return {'error': 'Order not found'}, 404
+        return {"error": "Order not found"}, 404
     response = jsonify(order.serialize())
     response.status_code = 200
     return response
+
 
 @app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["PUT"])
 def update_item_in_order(order_id, item_id):
@@ -194,10 +202,11 @@ def update_item_in_order(order_id, item_id):
     """
     item = OrderItems.update_item_in_order(order_id, item_id, request.json)
     if not item:
-        return {'error': 'Item not found in order'}, 404
+        return {"error": "Item not found in order"}, 404
     response = jsonify(item.serialize())
     response.status_code = 200
     return response
+
 
 @app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["DELETE"])
 def delete_item_from_order(order_id, item_id):
@@ -210,11 +219,11 @@ def delete_item_from_order(order_id, item_id):
 
     Returns:
         dict: A dictionary containing a success message if deleted, or an error message if not found.
-        
+
     """
     item = OrderItems.delete_item_from_order(order_id, item_id)
     if not item:
-        return {'error': 'Item not found in order'}, 404
-    response = jsonify({'message': 'Item successfully deleted'})
+        return {"error": "Item not found in order"}, 404
+    response = jsonify({"message": "Item successfully deleted"})
     response.status_code = 200
     return response

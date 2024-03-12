@@ -133,7 +133,7 @@ class TestOrdersModel(TestCase):
         order_data = {"status": "processing"}
         updated_order = Orders.update_order(order.order_id, order_data)
         self.assertEqual(updated_order.status, "processing")
-        order = Orders.update_order(updated_order.order_id+1, order_data)
+        order = Orders.update_order(updated_order.order_id + 1, order_data)
         assert order is None
 
     def test_delete_order_method(self):
@@ -153,6 +153,7 @@ class TestOrdersModel(TestCase):
         order = OrdersFactory()
         order.create()
         self.assertEqual(str(order), f"<Order id=[{order.order_id}]>")
+
 
 class TestOrderItemsModel(TestCase):
     """TestOrderItemsModel"""
@@ -223,7 +224,6 @@ class TestOrderItemsModel(TestCase):
         item = OrderItemsFactory(order_id=order.order_id)
         with self.assertRaises(DataValidationError):
             item.delete()
-        
 
     def test_serialize_item(self):
         """test_serialize_item"""
@@ -289,11 +289,17 @@ class TestOrderItemsModel(TestCase):
             item.order_id, item.order_item_id, item_data
         )
         self.assertEqual(updated_item.quantity, 2)
-        item = OrderItems.update_item_in_order(updated_item.order_id+1, updated_item.order_item_id, item_data)
+        item = OrderItems.update_item_in_order(
+            updated_item.order_id + 1, updated_item.order_item_id, item_data
+        )
         assert item is None
-        item = OrderItems.update_item_in_order(updated_item.order_id, updated_item.order_item_id+1, item_data)
+        item = OrderItems.update_item_in_order(
+            updated_item.order_id, updated_item.order_item_id + 1, item_data
+        )
         assert item is None
-        item = OrderItems.update_item_in_order(updated_item.order_id+1, updated_item.order_item_id+1, item_data)
+        item = OrderItems.update_item_in_order(
+            updated_item.order_id + 1, updated_item.order_item_id + 1, item_data
+        )
         assert item is None
 
     def test_delete_item_from_order(self):
@@ -309,13 +315,19 @@ class TestOrderItemsModel(TestCase):
         self.assertEqual(len(found), 0)
         item_test = OrderItems.delete_item_from_order(item.order_id, item.order_item_id)
         assert item_test is None
-        item_test = OrderItems.delete_item_from_order(item.order_id+1, item.order_item_id)
+        item_test = OrderItems.delete_item_from_order(
+            item.order_id + 1, item.order_item_id
+        )
         assert item_test is None
-        item_test = OrderItems.delete_item_from_order(item.order_id, item.order_item_id+1)
+        item_test = OrderItems.delete_item_from_order(
+            item.order_id, item.order_item_id + 1
+        )
         assert item_test is None
-        item_test = OrderItems.delete_item_from_order(item.order_id+1, item.order_item_id+1)
+        item_test = OrderItems.delete_item_from_order(
+            item.order_id + 1, item.order_item_id + 1
+        )
         assert item_test is None
-    
+
     def test_item_repr(self):
         """test_item_repr"""
         order = OrdersFactory()
@@ -323,4 +335,3 @@ class TestOrderItemsModel(TestCase):
         item = OrderItemsFactory(order_id=order.order_id)
         item.create()
         self.assertEqual(str(item), f"<OrderItem id=[{item.order_item_id}]>")
-

@@ -5,13 +5,15 @@ Test Factory to make fake objects for testing
 import factory
 from service.models import Orders, OrderItems
 
+# pylint: disable=R0801
+
 
 class OrdersFactory(factory.Factory):
     """
     Factory class for creating Orders instances.
     """
 
-    class Meta:
+    class Meta:  # pylint: disable=too-few-public-methods
         """
         Meta class for defining metadata options for the Orders factory.
         """
@@ -41,7 +43,7 @@ class OrderItemsFactory(factory.Factory):
     Factory class for creating instances of OrderItems model.
     """
 
-    class Meta:
+    class Meta:  # pylint: disable=too-few-public-methods
         """
         Meta class for defining metadata options for the OrderItems factory.
         """
