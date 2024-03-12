@@ -63,7 +63,7 @@ def create_order():
         response = jsonify(new_order.serialize())
         response.status_code = 201
         return response
-    except DataValidationError as e:
+    except Exception as e:
         return {"error": str(e)}, 400
 
 
@@ -87,7 +87,7 @@ def add_item_to_order(order_id: int):
         response = jsonify(new_item.serialize())
         response.status_code = 201
         return response
-    except DataValidationError as e:
+    except Exception as e:
         return {"error": str(e)}, 400
 
 
