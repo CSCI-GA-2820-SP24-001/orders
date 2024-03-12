@@ -270,31 +270,40 @@ class TestRoutesService(TestCase):
 
         # Try to update an item in a non-existent order
         resp = self.client.put(f'/orders/9999999/items/{item_id}', json={"product_id": 4, "quantity": 4, "price": 40.00})
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_delete_order(self):
-        """test_delete_order"""
+    def test_delete_order_item(self):
+        """test_delete_order_item"""
         # Create a new order
         resp = self.client.post("/orders", json={"customer_id":1})
         order_id = resp.json["order_id"]
 
-        # Delete the order
-        resp = self.client.delete(f'/orders/{order_id}')
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp.json['message'], "Order successfully deleted")
-
-        # Try to delete a non-existent order
-        resp = self.client.delete('/orders/9999999')
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        
-        # Create a new order
-        resp = self.client.post("/orders", json={"customer_id":2})
-        order_id = resp.json["order_id"]
-        
         # Add an item to the order
         resp = self.client.post(f'/orders/{order_id}/items', json={"product_id": 1, "quantity": 1, "price": 10.00})
+        item_id = resp.json["order_item_id"]
         resp = self.client.post(f'/orders/{order_id}/items', json={"product_id": 2, "quantity": 1, "price": 100.00})
-        
-        # Delete the order
-        resp = self.client.delete(f'/orders/{order_id}')
+
+        # Get the items from the order
+        resp = self.client.get(f'/orders/{order_id}/items')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp.json['message'], "Order successfully deleted")
+        self.assertEqual(len(resp.json), 2)
+
+        # Delete the item from the order
+        resp = self.client.delete(f'/orders/{order_id}/items/{item_id}')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.json['message'], "Item successfully deleted")
+
+        # Get the new list of items from the order
+        resp = self.client.get(f'/orders/{order_id}/items')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(resp.json), 1)
+        self.assertEqual(resp.json[0]['product_id'], 2)
+        self.assertEqual(resp.json[0]['quantity'], 1)
+        self.assertEqual(resp.json[0]['price'], 100.00)
+
+        # Try to delete a non-existent item from the order
+        resp = self.client.delete(f'/orders/{order_id}/items/9999999')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Try to delete an item from a non-existent order
+        resp = self.client.delete(f'/orders/9999999/items/{item_id}')
