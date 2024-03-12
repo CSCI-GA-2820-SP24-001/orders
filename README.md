@@ -7,7 +7,7 @@ This is a skeleton you can use to start your projects
 
 ## Overview
 
-This project template contains starter code for your class project. The `/service` folder contains your `models.py` file for your model and a `routes.py` file for your service. The `/tests` folder has test case starter code for testing the model and the service separately. All you need to do is add your functionality. You can use the [lab-flask-tdd](https://github.com/nyu-devops/lab-flask-tdd) for code examples to copy from.
+This project contains code for the `/Orders` project. The folder contains a `models.py` file for the model and a `routes.py` file for the service. The `/tests` folder has test case starter code for testing the model and the service separately. All you need to do is add your functionality. You can use the [lab-flask-tdd](https://github.com/nyu-devops/lab-flask-tdd) for code examples to copy from.
 
 ## Automatic Setup
 
@@ -22,9 +22,9 @@ There are 4 hidden files that you will need to copy manually if you use the Mac 
 These should be copied using a bash shell as follows:
 
 ```bash
-    cp .gitignore  ../<your_repo_folder>/
-    cp .flaskenv ../<your_repo_folder>/
-    cp .gitattributes ../<your_repo_folder>/
+    cp .gitignore  ../<https://github.com/CSCI-GA-2820-SP24-001/orders/blob/master/.gitignore>/
+    cp .flaskenv ../<https://github.com/CSCI-GA-2820-SP24-001/orders/blob/master/.flaskenv>/
+    cp .gitattributes ../<https://github.com/CSCI-GA-2820-SP24-001/orders/blob/master/.gitattributes>/
 ```
 
 ## Contents
