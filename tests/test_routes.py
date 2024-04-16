@@ -378,3 +378,8 @@ class TestRoutesService(TestCase):
 
         # Try to delete an item from a non-existent order
         resp = self.client.delete(f"/orders/9999999/items/{item_id}")
+
+    def test_health(self):
+        """test_health"""
+        resp = self.client.get("/health")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)

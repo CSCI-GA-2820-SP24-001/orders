@@ -154,6 +154,16 @@ class TestOrdersModel(TestCase):
         order.create()
         self.assertEqual(str(order), f"<Order id=[{order.order_id}]>")
 
+    def test_get_all_orders_amount(self):
+        """test_get_all_orders_amount"""
+        test_orders = OrdersFactory.create_batch(5)
+        amount = Orders.get_all_orders_amount()
+        self.assertEqual(amount, 0)
+        for order in test_orders:
+            order.create()
+        amount = Orders.get_all_orders_amount()
+        self.assertEqual(amount, 5)
+
 
 class TestOrderItemsModel(TestCase):
     """TestOrderItemsModel"""

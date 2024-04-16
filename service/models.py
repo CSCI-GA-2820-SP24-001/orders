@@ -174,6 +174,12 @@ class Orders(db.Model):
         order.delete()
         return order
 
+    @classmethod
+    def get_all_orders_amount(cls):
+        """Gets a count of all orders in the database"""
+        logger.info("Getting all orders amount ...")
+        return cls.query.count()
+
 
 class OrderItems(db.Model):
     """

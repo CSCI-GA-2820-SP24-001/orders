@@ -23,8 +23,8 @@ and Delete Pets from the inventory of pets in the PetShop
 
 from flask import jsonify, request
 from flask import current_app as app  # Import Flask application
-from service.models import OrderItems, Orders, DataValidationError
-from service.common import status  # HTTP Status Codes
+from service.models import OrderItems, Orders
+from service.common import status, error_handlers  # HTTP Status Codes
 
 
 ######################################################################
@@ -37,6 +37,22 @@ def index():
         "Reminder: return some useful information in json format about the service here",
         status.HTTP_200_OK,
     )
+
+
+@app.route("/health")
+def health():
+    """Tries to query the database to check if service is up"""
+    try:
+        amount = Orders.get_all_orders_amount()
+        return (
+            {"status": "healthy", "order_amount": amount},
+            status.HTTP_200_OK,
+        )
+    except Exception as e:
+        return (
+            {"status": "unhealthy", "error": str(e)},
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
 
 ######################################################################
@@ -64,7 +80,7 @@ def create_order():
         response.status_code = 201
         return response
     except Exception as e:
-        return {"error": str(e)}, 400
+        return error_handlers.bad_request(e)
 
 
 @app.route("/orders/<int:order_id>/items", methods=["POST"])
@@ -88,7 +104,7 @@ def add_item_to_order(order_id: int):
         response.status_code = 201
         return response
     except Exception as e:
-        return {"error": str(e)}, 400
+        return error_handlers.bad_request(e)
 
 
 @app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["GET"])
@@ -106,7 +122,7 @@ def get_item_in_order(order_id, item_id):
     """
     item = OrderItems.find_item_in_order(order_id, item_id)
     if not item:
-        return {"error": "Item not found"}, 404
+        return error_handlers.not_found("Item not found")
     response = jsonify(item.serialize())
     response.status_code = 200
     return response
@@ -126,7 +142,7 @@ def get_items_in_order(order_id):
     """
     items = OrderItems.find_by_order(order_id)
     if not items:
-        return {"error": "No items found for this order"}, 404
+        return error_handlers.not_found("No items found for this order")
     response = jsonify([item.serialize() for item in items])
     response.status_code = 200
     return response
@@ -146,7 +162,7 @@ def get_order(order_id):
     """
     order = Orders.find(order_id)
     if not order:
-        return {"error": "Order not found"}, 404
+        return error_handlers.not_found("Order not found")
     response = jsonify(order.serialize())
     response.status_code = 200
     return response
@@ -181,7 +197,7 @@ def update_order(order_id):
     """
     order = Orders.update_order(order_id, request.json)
     if not order:
-        return {"error": "Order not found"}, 404
+        return error_handlers.not_found("Order not found")
     response = jsonify(order.serialize())
     response.status_code = 200
     return response
@@ -202,7 +218,7 @@ def update_item_in_order(order_id, item_id):
     """
     item = OrderItems.update_item_in_order(order_id, item_id, request.json)
     if not item:
-        return {"error": "Item not found in order"}, 404
+        return error_handlers.not_found("Item not found in order")
     response = jsonify(item.serialize())
     response.status_code = 200
     return response
@@ -223,7 +239,7 @@ def delete_item_from_order(order_id, item_id):
     """
     item = OrderItems.delete_item_from_order(order_id, item_id)
     if not item:
-        return {"error": "Item not found in order"}, 404
+        return error_handlers.not_found("Item not found in order")
     response = jsonify({"message": "Item successfully deleted"})
     response.status_code = 200
     return response
