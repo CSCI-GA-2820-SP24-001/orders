@@ -21,7 +21,7 @@ This service implements a REST API that allows you to Create, Read, Update
 and Delete Pets from the inventory of pets in the PetShop
 """
 
-from flask import jsonify, request
+from flask import jsonify, request, url_for
 from flask import current_app as app  # Import Flask application
 from service.models import OrderItems, Orders
 from service.common import status, error_handlers  # HTTP Status Codes
@@ -34,7 +34,14 @@ from service.common import status, error_handlers  # HTTP Status Codes
 def index():
     """Root URL response"""
     return (
-        "Reminder: return some useful information in json format about the service here",
+        jsonify(
+            name="Orders Service REST API",
+            version="1.0",
+            paths=[
+                url_for("health", _external=True),
+                url_for("list_orders", _external=True),
+            ],
+        ),
         status.HTTP_200_OK,
     )
 
