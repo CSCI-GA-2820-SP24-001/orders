@@ -17,15 +17,22 @@ gunicorn = "^21.2.0"
 
 [tool.poetry.group.dev.dependencies]
 honcho = "^1.1.0"
+# Code Quality
 pylint = "^3.0.2"
 flake8 = "^6.1.0"
 black = "^23.10.1"
+# Test-Driven Development
 pytest = "^7.4.3"
 pytest-pspec = "^0.0.4"
 pytest-cov = "^4.1.0"
 factory-boy = "^3.3.0"
 coverage = "^7.3.2"
 httpie = "^3.2.2"
+# Behavior-Driven Development
+behave = "^1.2.6"
+selenium = "4.16.0" # newer versions do not work
+compare3 = "^1.0.4"
+requests = "^2.31.0"
 
 [build-system]
 requires = ["poetry-core"]
