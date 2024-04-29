@@ -42,6 +42,7 @@ Scenario: List orders
 Scenario: Update Orders
     When I visit the "Home Page"
     And I press the "Clear" button
+    And I set the "Customer ID" to "1001"
     And I press the "Search" button
     Then I should see the message "Success"
     And I should see "1001" in the "Customer ID" field
@@ -60,6 +61,7 @@ Scenario: Update Orders
 Scenario: Delete Orders
     When I visit the "Home Page"
     And I press the "Clear" button
+    And I set the "Customer ID" to "1001"
     And I press the "Search" button
     Then I should see the message "Success"
     And I should see "1001" in the results
@@ -70,4 +72,25 @@ Scenario: Delete Orders
     Then I should see the message "Success"
     And I should not see "1001" in the results
 
+# SHIP ORDERS
+Scenario: Ship Orders
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I set the "Customer ID" to "1001"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "1001" in the results
+    And I should see "1001" in the "Customer ID" field
+    And I should see "pending" in the results
+    And I should see "TRK12345" in the results
+    And I should not see "shipped" in the results
+    When I set the "Tracking Number" to "testTest"
+    And I press the "Ship" button
+    And I press the "Clear" button
+    And I set the "Customer ID" to "1001"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should not see "pending" in the results
+    And I should see "shipped" in the results
+    And I should see "testTest" in the results
 
