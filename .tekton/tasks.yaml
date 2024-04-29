@@ -135,6 +135,60 @@ spec:
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
+  name: behave-env
+  labels:
+    app.kubernetes.io/version: "0.1"
+  annotations:
+    tekton.dev/categories: Testing
+    tekton.dev/pipelines.minVersion: "0.17.0"
+    tekton.dev/tags: python, behave
+    tekton.dev/displayName: "behave tests"
+    tekton.dev/platforms: "linux/amd64,linux/s390x,linux/ppc64le"
+spec:
+  workspaces:
+    - name: source
+  description: >-
+    This task can be used to perform unit tests with pytest.
+    It supports both requirements.txt and poetry.lock files.
+
+    It also has the ability to create an environment variable
+    that is sourced from a Secret. This allows you to define
+    credentials that can be used to connect to a test database.
+  params:
+    - name: BASE_URL
+      description: The URL of the orders endpoint
+      type: string
+      default: "http://orders:8080"
+  steps:
+    - name: pytest
+      image: rofrano/pipeline-selenium:latest
+      workingDir: $(workspaces.source.path)
+      env:
+        - name: BASE_URL
+          value: $(params.BASE_URL)
+      script: |
+        #!/bin/bash
+
+        set -e
+        export PATH=$PATH:$HOME/.local/bin:
+
+        echo "***** Installing dependencies *****"
+        if [ -e "poetry.lock" ]; then
+          echo "Found poetry.lock file: using poetry "
+          python -m pip install poetry poetry-plugin-export
+          poetry export --with=dev -f requirements.txt --output requirements.txt
+          python -m pip install --user -r requirements.txt
+        elif -e "requirements.txt" ]; then
+          python -m pip install --user -r requirements.txt
+        fi
+
+        echo "***** Running Tests *****"
+        echo DRIVER="chrome"
+        behave
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
   name: deploy-image
   labels:
     app.kubernetes.io/version: "0.1"
@@ -227,60 +281,3 @@ spec:
           echo Applying manifests in $(inputs.params.manifest_dir) directory
           oc apply -f $(inputs.params.manifest_dir)
           echo -----------------------------------
-
----
-apiVersion: tekton.dev/v1beta1
-kind: Task
-metadata:
-  name: behave
-  labels:
-    app.kubernetes.io/version: "0.1"
-  annotations:
-    tekton.dev/categories: Testing
-    tekton.dev/pipelines.minVersion: "0.17.0"
-    tekton.dev/tags: python, bdd, behave
-    tekton.dev/displayName: "bdd tests"
-    tekton.dev/platforms: "linux/amd64"
-spec:
-  workspaces:
-    - name: source
-  description: >-
-    This task can be used to perform bdd tests with behave.
-  params:
-    - name: BASE_URL
-      description: The url of the application to test
-      type: string
-    - name: WAIT_SECONDS
-      description: The number of seconds to wait for a reply
-      type: string
-      default: "60"
-    - name: DRIVER
-      description: The web driver to use (chrome or firefox)
-      type: string
-      default: "chrome"
-  steps:
-    - name: behave
-      image: rofrano/pipeline-selenium
-      workingDir: $(workspaces.source.path)
-      env:
-       - name: BASE_URL
-         value: $(params.BASE_URL)
-       - name: WAIT_SECONDS
-         value: $(params.WAIT_SECONDS)
-       - name: DRIVER
-         value: $(params.DRIVER)
-      script: |
-        #!/bin/bash
-        set -e
-        export PATH=$PATH:$HOME/.local/bin:
-
-        echo "***** Installing dependencies *****"
-        if [ -e "poetry.lock" ]; then
-          echo "Found poetry.lock file: using poetry"
-          python -m pip install poetry poetry-plugin-export
-          poetry export --with=dev -f requirements.txt --output requirements.txt
-        fi
-        python -m pip install --user -r requirements.txt
-
-        echo "***** Running Tests *****"
-        behave
