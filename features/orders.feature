@@ -29,6 +29,7 @@ Scenario: Create a order
 # LIST ALL ORDERS
 Scenario: List orders
     When I visit the "Home Page"
+    And I press the "Clear" button
     And I press the "Search" button
     Then I should see the message "Success"
     And I should see "1001" in the results
@@ -40,6 +41,7 @@ Scenario: List orders
 # UPDATE ORDERS
 Scenario: Update Orders
     When I visit the "Home Page"
+    And I press the "Clear" button
     And I press the "Search" button
     Then I should see the message "Success"
     And I should see "1001" in the "Customer ID" field
@@ -57,6 +59,7 @@ Scenario: Update Orders
 # DELETE ORDERS
 Scenario: Delete Orders
     When I visit the "Home Page"
+    And I press the "Clear" button
     And I press the "Search" button
     Then I should see the message "Success"
     And I should see "1001" in the results
