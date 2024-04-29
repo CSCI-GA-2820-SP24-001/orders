@@ -185,11 +185,51 @@ $(function () {
 
     $("#search-btn").click(function () {
 
+        let customer_id = $("#customer_id").val();
+        let status = $("#status").val();
+        let order_date = $("#order_date").val();
+        let discount_amount = $("#discount_amount").val();
+        let tracking_number = $("#tracking_number").val();
+
+        let queryString = ""
+
+        if (customer_id) {
+            queryString += 'customer_id=' + customer_id
+        }
+        if (status) {
+            if (queryString.length > 0) {
+                queryString += '&status=' + status
+            } else {
+                queryString += 'status=' + status
+            }
+        }
+        if (order_date) {
+            if (queryString.length > 0) {
+                queryString += '&order_date=' + order_date
+            } else {
+                queryString += 'order_date=' + order_date
+            }
+        }
+        if (discount_amount) {
+            if (queryString.length > 0) {
+                queryString += '&discount_amount=' + discount_amount
+            } else {
+                queryString += 'discount_amount=' + discount_amount
+            }
+        }
+        if (tracking_number) {
+            if (queryString.length > 0) {
+                queryString += '&tracking_number=' + tracking_number
+            } else {
+                queryString += 'tracking_number=' + tracking_number
+            }
+        }
+
         $("#flash_message").empty();
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/orders`,
+            url: `/orders?${queryString}`,
             contentType: "application/json",
             data: ''
         })
