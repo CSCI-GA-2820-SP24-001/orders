@@ -301,3 +301,29 @@ def delete_item_from_order(order_id, item_id):
     response = jsonify({"message": "Item successfully deleted"})
     response.status_code = 200
     return response
+
+@app.route("/orders/<int:order_id>/ship", methods=["PUT"])
+def ship_order(order_id):
+    """
+    Ship an order.
+
+    Args:
+        order_id (int): The ID of the order.
+
+    Returns:
+        dict: A dictionary containing the serialized order if updated, or an error message if not found.
+
+    """
+    order = Orders.find(order_id)
+    if not order:
+        return error_handlers.not_found("Order not found")
+    tracking_number = request.json.get("tracking_number", None)
+    if tracking_number is None:
+        return error_handlers.bad_request("Tracking number is required to ship an order")
+    order.status = "shipped"
+    order.tracking_number = tracking_number
+    updated_json = order.serialize()
+    order = Orders.update_order(order_id, updated_json)
+    response = jsonify(order.serialize())
+    response.status_code = 200
+    return response
