@@ -103,6 +103,18 @@ spec:
       workspaces:
         - name: source
           workspace: pipeline-workspace
+    - name: behave
+      params:
+        - name: BASE_URL
+          value: 'http://orders:8080'
+      runAfter:
+        - git-clone
+      taskRef:
+        kind: Task
+        name: behave-env
+      workspaces:
+        - name: source
+          workspace: pipeline-workspace
     - name: buildah
       params:
         - name: IMAGE
@@ -128,6 +140,7 @@ spec:
       runAfter:
         - linting
         - testing
+        - behave
       taskRef:
         kind: ClusterTask
         name: buildah
