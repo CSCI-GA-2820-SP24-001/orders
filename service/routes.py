@@ -206,7 +206,7 @@ def list_orders():
         order_date: datetime = datetime.fromisoformat(order_date)
         orders = Orders.find_by_order_date(order_date)
     elif order_status is not None:
-        app.logger.info("Find by status %s", status)
+        app.logger.info("Find by status %s", order_status)
         orders = Orders.find_by_status(order_status.lower())
     elif tracking_number is not None:
         app.logger.info("Find by tracking_number: %s", tracking_number)
