@@ -511,3 +511,22 @@ class TestRoutesService(TestCase):
         resp = self.client.get("/orders?discount_amount=10.0")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp.json), 1)
+    
+    def test_ship_order(self):
+        """test_ship_order"""
+        # Create a new order
+        resp = self.client.post("/orders", json={"customer_id": 1})
+        order_id = resp.json["order_id"]
+        
+        resp = self.client.put(f"/orders/{order_id}/ship",json={})
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Ship the order
+        resp = self.client.put(f"/orders/{order_id}/ship", json={"tracking_number": "aaaa"})
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.json["status"], "shipped")
+        self.assertEqual(resp.json["tracking_number"], "aaaa")
+
+        # Try to ship a non-existent order
+        resp = self.client.put("/orders/9999999/ship")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
