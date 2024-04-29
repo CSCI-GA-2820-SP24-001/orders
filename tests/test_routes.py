@@ -371,6 +371,21 @@ class TestRoutesService(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    # ----------------------------------------------------------
+    # TEST ACTIONS
+    # ----------------------------------------------------------
+    def test_like_an_item(self):
+        """It should Like an Item"""
+        items = self._create_items(10)
+        response = self.client.put(f"{BASE_URL}/{item.id}/like")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get(f"{BASE_URL}/{item.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        logging.debug("Response data: %s", data)
+        self.assertEqual(data["available"], False)
+
+
     def test_delete_order_item(self):
         """test_delete_order_item"""
         # Create a new order
