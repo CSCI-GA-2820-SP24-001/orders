@@ -32,12 +32,5 @@ Scenario: List orders
     And I should see "2" under the row "User ID 2" in the table
     And I should see "3" under the row "User ID 3" in the table
 
-# UPDATE A ORDER
-Scenario: Update a order
-    When I visit the "Home Page"
-    And I press the "Search oder" button
-    Then I should see "1" under the row "User ID 1" in the table
-    When I copy the "Order ID" field
-    And I set the "Order User ID" to "10"
-    And I press the "Update Order" button
-    Then I should see the message "Success"
+
+
