@@ -185,17 +185,46 @@ def get_order(order_id):
 
 @app.route("/orders", methods=["GET"])
 def list_orders():
-    """
-    List all orders.
+    """Returns all of the Orders"""
+    app.logger.info("Request to list Orders...")
 
-    Returns:
-        dict: A dictionary containing the serialized orders.
+    orders = []
 
-    """
-    orders = Orders.list_all()
-    response = jsonify([order.serialize() for order in orders])
-    response.status_code = 200
-    return response
+    # Parse any arguments from the query string
+    order_id = request.args.get("order_id")
+    customer_id = request.args.get("customer_id")
+    order_date = request.args.get("order_date")
+    status = request.args.get("status")
+    tracking_number = request.args.get("tracking_number")
+    discount_amount = request.args.get("discount_amount")
+
+    if order_id:
+        app.logger.info("Find by order_id: %s", order_id)
+        orders = Orders.find_by_order_id(order_id)
+    elif customer_id:
+        app.logger.info("Find by customer_id: %s", customer_id)
+        orders = Orders.find_by_customer_id(customer_id)
+    elif order_date:
+        app.logger.info("Find by order_date: %s", order_date)
+        orders = Orders.find_by_order_date(order_date)
+    elif status:
+        app.logger.info("Find by status %s", status)
+        # create enum from string
+        status_value = status.lower()
+        orders = Orders.find_by_status(status_value)
+    elif tracking_number:
+        app.logger.info("Find by tracking_number: %s", tracking_number)
+        orders = Orders.find_by_tracking_number(tracking_number)
+    elif discount_amount:
+        app.logger.info("Find by discount_amount: %s", discount_amount)
+        orders = Orders.find_by_discount_amount(discount_amount)
+    else:
+        app.logger.info("Find all")
+        orders = Orders.all()
+
+    results = [order.serialize() for order in orders]
+    app.logger.info("[%s] Orders returned", len(results))
+    return jsonify(results), status.HTTP_200_OK
 
 
 @app.route("/orders/<int:order_id>", methods=["PUT"])
