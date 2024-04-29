@@ -179,6 +179,77 @@ class Orders(db.Model):
         """Gets a count of all orders in the database"""
         logger.info("Getting all orders amount ...")
         return cls.query.count()
+    
+
+    @classmethod
+    def find_by_customer_id(cls, customer_id: int) -> list:
+        """Returns all Orders with the given customer_id
+
+        :param customer_id: the customer_id of the Orders you want to match
+        :type customer_id: str
+
+        :return: a collection of Orders with that customer_id
+        :rtype: list
+
+        """
+        logger.info("Processing customer_id query for %s ...", customer_id)
+        return cls.query.filter_by(customer_id=customer_id).all()
+
+    @classmethod
+    def find_by_order_date(cls, order_date: str) -> list:
+        """Returns all of the Orders in a order_date
+
+        :param order_date: the order_date of the Orders you want to match
+        :type order_date: str
+
+        :return: a collection of Orders in that order_date
+        :rtype: list
+
+        """
+        logger.info("Processing order_date query for %s ...", order_date)
+        return cls.query.filter_by(order_date=order_date).all()
+
+    @classmethod
+    def find_by_status(cls, status: str = "pending") -> list:
+        """Returns all Orders by their status
+
+        :param status: values are ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned', 'refunded']
+        :type available: enum
+
+        :return: a collection of Orders that are available
+        :rtype: list
+
+        """
+        logger.info("Processing status query for %s ...", status)
+        return cls.query.filter_by(status=status).all()
+    
+    @classmethod
+    def find_by_tracking_number(cls, tracking_number: str) -> list:
+        """Returns an Order by its tracking_number
+
+        :param tracking_number: the tracking_number of the Orders you want to match
+        :type tracking_number: str
+
+        :return: a collection of Orders in that tracking_number
+        :rtype: list
+
+        """
+        logger.info("Processing tracking_number query for %s ...", tracking_number)
+        return cls.query.filter_by(tracking_number=tracking_number).all()
+    
+    @classmethod
+    def find_by_discount_amount(cls, discount_amount: float) -> list:
+        """Returns all Pets by their discount amount
+
+        :param discount_amount: the discount_amount of the Orders you want to match
+        :type discount_amount: str
+
+        :return: a collection of Orders in that discount_amount
+        :rtype: list
+
+        """
+        logger.info("Processing discount_amount query for %s ...", discount_amount)
+        return cls.query.filter_by(discount_amount=discount_amount).all()
 
 
 class OrderItems(db.Model):
@@ -194,7 +265,6 @@ class OrderItems(db.Model):
     product_id: int = db.Column(db.Integer, nullable=False)
     quantity: int = db.Column(db.Integer, nullable=False)
     price: float = db.Column(db.Float, nullable=False)
-    like_count = db.Column(db.Integer, default=0)
 
     def __repr__(self):
         return f"<OrderItem id=[{self.order_item_id}]>"
@@ -276,78 +346,8 @@ class OrderItems(db.Model):
     def find_by_order(cls, order_id):
         """Returns all OrderItems with the given order ID"""
         logger.info("Processing order query for %s ...", order_id)
-        return cls.query.session.get(cls, order_id)
+        return cls.query.filter(cls.order_id == order_id).all()
     
-
-    @classmethod
-    def find_by_customer_id(cls, customer_id: str) -> list:
-        """Returns all Orders with the given customer_id
-
-        :param customer_id: the customer_id of the Orders you want to match
-        :type customer_id: str
-
-        :return: a collection of Orders with that customer_id
-        :rtype: list
-
-        """
-        logger.info("Processing customer_id query for %s ...", customer_id)
-        return cls.query.filter(cls.customer_id == customer_id)
-
-    @classmethod
-    def find_by_order_date(cls, order_date: str) -> list:
-        """Returns all of the Orders in a order_date
-
-        :param order_date: the order_date of the Orders you want to match
-        :type order_date: str
-
-        :return: a collection of Orders in that order_date
-        :rtype: list
-
-        """
-        logger.info("Processing order_date query for %s ...", order_date)
-        return cls.query.filter(cls.order_date == order_date)
-
-    @classmethod
-    def find_by_status(cls, status: str = "pending") -> list:
-        """Returns all Orders by their status
-
-        :param status: values are ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned', 'refunded']
-        :type available: enum
-
-        :return: a collection of Orders that are available
-        :rtype: list
-
-        """
-        logger.info("Processing status query for %s ...", status.name)
-        return cls.query.filter(cls.status == status)
-    
-    @classmethod
-    def find_by_tracking_number(cls, tracking_number: str) -> list:
-        """Returns an Order by its tracking_number
-
-        :param tracking_number: the tracking_number of the Orders you want to match
-        :type tracking_number: str
-
-        :return: a collection of Orders in that tracking_number
-        :rtype: list
-
-        """
-        logger.info("Processing tracking_number query for %s ...", tracking_number)
-        return cls.query.filter(cls.tracking_number == tracking_number)
-    
-    @classmethod
-    def find_by_discount_amount(cls, discount_amount: str) -> list:
-        """Returns all Pets by their discount amount
-
-        :param discount_amount: the discount_amount of the Orders you want to match
-        :type discount_amount: str
-
-        :return: a collection of Orders in that discount_amount
-        :rtype: list
-
-        """
-        logger.info("Processing discount_amount query for %s ...", discount_amount)
-        return cls.query.filter(cls.discount_amount == discount_amount)
 
     @classmethod
     def create_item(cls, order_id, item_data):

@@ -21,6 +21,7 @@ This service implements a REST API that allows you to Create, Read, Update
 and Delete Pets from the inventory of pets in the PetShop
 """
 
+from datetime import datetime
 from flask import jsonify, request, url_for
 from flask import current_app as app  # Import Flask application
 from service.models import OrderItems, Orders
@@ -191,40 +192,37 @@ def list_orders():
     orders = []
 
     # Parse any arguments from the query string
-    order_id = request.args.get("order_id")
-    customer_id = request.args.get("customer_id")
+    customer_id = request.args.get("customer_id",type=int)
     order_date = request.args.get("order_date")
-    status = request.args.get("status")
+    order_status = request.args.get("status")
     tracking_number = request.args.get("tracking_number")
-    discount_amount = request.args.get("discount_amount")
+    discount_amount = request.args.get("discount_amount", type=float)
 
-    if order_id:
-        app.logger.info("Find by order_id: %s", order_id)
-        orders = Orders.find_by_order_id(order_id)
-    elif customer_id:
+    if customer_id is not None:
         app.logger.info("Find by customer_id: %s", customer_id)
         orders = Orders.find_by_customer_id(customer_id)
-    elif order_date:
+    elif order_date is not None:
         app.logger.info("Find by order_date: %s", order_date)
+        order_date: datetime = datetime.fromisoformat(order_date)
         orders = Orders.find_by_order_date(order_date)
-    elif status:
+    elif order_status is not None:
         app.logger.info("Find by status %s", status)
-        # create enum from string
-        status_value = status.lower()
-        orders = Orders.find_by_status(status_value)
-    elif tracking_number:
+        orders = Orders.find_by_status(order_status.lower())
+    elif tracking_number is not None:
         app.logger.info("Find by tracking_number: %s", tracking_number)
         orders = Orders.find_by_tracking_number(tracking_number)
-    elif discount_amount:
+    elif discount_amount is not None:
         app.logger.info("Find by discount_amount: %s", discount_amount)
         orders = Orders.find_by_discount_amount(discount_amount)
     else:
         app.logger.info("Find all")
-        orders = Orders.all()
+        orders = Orders.list_all()
 
     results = [order.serialize() for order in orders]
     app.logger.info("[%s] Orders returned", len(results))
-    return jsonify(results), status.HTTP_200_OK
+    response = jsonify(results)
+    response.status_code =  status.HTTP_200_OK
+    return response
 
 
 @app.route("/orders/<int:order_id>", methods=["PUT"])
@@ -283,22 +281,6 @@ def update_item_in_order(order_id, item_id):
     response = jsonify(item.serialize())
     response.status_code = 200
     return response
-
-
-@app.route("/items/<int:item_id>/like", methods=["PUT"])
-def like_item(item_id):
-    """Purchasing an item increases the like count"""
-    app.logger.info("Add like to item with id: %d", item_id)
-
-    # Attempt to find the item and abort if not found
-    item = item.find(item_id)
-    if not item:
-        abort(status.HTTP_404_NOT_FOUND, f"Item with id '{item_id}' was not found.")
-    
-    # Increment the like count
-    item.like_count += 1
-    return jsonify({"message": "Like added successfully", "like_count": item.like_count})
-
 
 @app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["DELETE"])
 def delete_item_from_order(order_id, item_id):

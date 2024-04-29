@@ -34,7 +34,7 @@ class OrdersFactory(factory.Factory):
             "refunded",
         ]
     )
-    tracking_number = factory.Faker("random_number", digits=10)
+    tracking_number = factory.Faker("pystr")
     discount_amount = factory.Faker("random_number", digits=2)
 
 
