@@ -161,3 +161,15 @@ spec:
       workspaces:
         - name: source
           workspace: pipeline-workspace
+    - name: behave
+      params:
+        - name: BASE_URL
+          value: 'http://orders:8080'
+      runAfter:
+        - deploy-image
+      taskRef:
+        kind: Task
+        name: behave
+      workspaces:
+        - name: source
+          workspace: pipeline-workspace
