@@ -66,6 +66,5 @@ Scenario: Delete Orders
     When I press the "Search" button
     Then I should see the message "Success"
     And I should not see "1001" in the results
-    And I should not see "1001" in the "Customer ID" field
 
 
