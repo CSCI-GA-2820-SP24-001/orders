@@ -15,3 +15,14 @@ Scenario: The server is running
     When I visit the "Home Page"
     Then I should see "Orders RESTful Service" in the title
     And I should not see "404 Not Found"
+
+
+# CREATE A ORDER
+Scenario: Create a order
+    When I visit the "Home Page"
+    And I set the "Order User ID" to "10"
+    And I press the "Create order" button
+    Then I should see the message "Success"
+
+
+
