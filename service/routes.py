@@ -256,6 +256,21 @@ def update_item_in_order(order_id, item_id):
     return response
 
 
+@app.route("/items/<int:item_id>/like", methods=["PUT"])
+def like_item(item_id):
+    """Purchasing an item increases the like count"""
+    app.logger.info("Add like to item with id: %d", item_id)
+
+    # Attempt to find the item and abort if not found
+    item = item.find(item_id)
+    if not item:
+        abort(status.HTTP_404_NOT_FOUND, f"Item with id '{item_id}' was not found.")
+    
+    # Increment the like count
+    item.like_count += 1
+    return jsonify({"message": "Like added successfully", "like_count": item.like_count})
+
+
 @app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["DELETE"])
 def delete_item_from_order(order_id, item_id):
     """

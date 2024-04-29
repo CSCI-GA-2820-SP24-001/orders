@@ -194,6 +194,7 @@ class OrderItems(db.Model):
     product_id: int = db.Column(db.Integer, nullable=False)
     quantity: int = db.Column(db.Integer, nullable=False)
     price: float = db.Column(db.Float, nullable=False)
+    like_count = db.Column(db.Integer, default=0)
 
     def __repr__(self):
         return f"<OrderItem id=[{self.order_item_id}]>"
