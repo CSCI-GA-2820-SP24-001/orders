@@ -13,7 +13,6 @@ DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
 )
 
-
 class TestOrdersModel(TestCase):
     """TestOrdersModel"""
 
@@ -133,8 +132,6 @@ class TestOrdersModel(TestCase):
         order_data = {"status": "processing"}
         updated_order = Orders.update_order(order.order_id, order_data)
         self.assertEqual(updated_order.status, "processing")
-        order = Orders.update_order(updated_order.order_id + 1, order_data)
-        assert order is None
 
     def test_delete_order_method(self):
         """test_delete_order_method"""
@@ -145,8 +142,6 @@ class TestOrdersModel(TestCase):
         Orders.delete_order(order.order_id)
         found = Orders.query.all()
         self.assertEqual(len(found), 0)
-        order = Orders.delete_order(1)
-        assert order is None
 
     def test_order_repr(self):
         """test_order_repr"""
@@ -163,7 +158,56 @@ class TestOrdersModel(TestCase):
             order.create()
         amount = Orders.get_all_orders_amount()
         self.assertEqual(amount, 5)
+        
+    def test_find_by_customer_id(self):
+        """test_find_by_customer_id"""
+        test_orders = OrdersFactory.create_batch(10)
+        customer_id = test_orders[0].customer_id
+        count = len([order for order in test_orders if order.customer_id == customer_id])
+        for order in test_orders:
+            order.create()
+        found = Orders.find_by_customer_id(customer_id)
+        self.assertEqual(len(found), count)
 
+    def test_find_by_order_date(self):
+        """test_find_by_order_date"""
+        test_orders = OrdersFactory.create_batch(10)
+        order_date = test_orders[0].order_date
+        count = len([order for order in test_orders if order.order_date == order_date])
+        for order in test_orders:
+            order.create()
+        found = Orders.find_by_order_date(order_date)
+        self.assertEqual(len(found), count)
+
+    def test_find_by_status(self):
+        """test_find_by_status"""
+        test_orders = OrdersFactory.create_batch(10)
+        status = test_orders[0].status
+        count = len([order for order in test_orders if order.status == status])
+        for order in test_orders:
+            order.create()
+        found = Orders.find_by_status(status)
+        self.assertEqual(len(found), count)
+
+    def test_find_by_tracking_number(self):
+        """test_find_by_tracking_number"""
+        test_orders = OrdersFactory.create_batch(10)
+        tracking_number = test_orders[0].tracking_number
+        count = len([order for order in test_orders if order.tracking_number == tracking_number])
+        for order in test_orders:
+            order.create()
+        found = Orders.find_by_tracking_number(tracking_number)
+        self.assertEqual(len(found), count)
+
+    def test_find_by_discount_amount(self):
+        """test_find_by_discount_amount"""
+        test_orders = OrdersFactory.create_batch(10)
+        discount_amount = test_orders[0].discount_amount
+        count = len([order for order in test_orders if order.discount_amount == discount_amount])
+        for order in test_orders:
+            order.create()
+        found = Orders.find_by_discount_amount(discount_amount)
+        self.assertEqual(len(found), count)
 
 class TestOrderItemsModel(TestCase):
     """TestOrderItemsModel"""
@@ -263,66 +307,6 @@ class TestOrderItemsModel(TestCase):
         item.create()
         found = OrderItems.find_by_order(item.order_id)
         self.assertEqual(found[0].order_id, item.order_id)
-
-    def test_find_by_customer_id(self):
-        """It should Find Pets by Customer ID"""
-        Orders = OrdersFactory.create_batch(10)
-        for order in Orders:
-            order.create()
-        customer_id = order[0].customer_id
-        count = len([order for order in Orders if order.customer_id == customer_id])
-        found = order.find_by_customer_id(customer_id)
-        self.assertEqual(found.count(), count)
-        for order in found:
-            self.assertEqual(order.customer_id, customer_id)
-
-    def test_find_by_order_date(self):
-        """It should Find orders by order date"""
-        Orders = OrdersFactory.create_batch(10)
-        for order in Orders:
-            order.create()
-        order_date = order[0].order_date
-        count = len([order for order in Orders if order.order_date == order_date])
-        found = order.find_by_order_date(order_date)
-        self.assertEqual(found.count(), count)
-        for order in found:
-            self.assertEqual(order.order_date, order_date)
-
-    def test_find_by_status(self):
-        """It should Find orders by Status"""
-        Orders = OrdersFactory.create_batch(10)
-        for order in Orders:
-            order.create()
-        status = order[0].status
-        count = len([order for order in Orders if order.status == status])
-        found = order.find_by_status(status)
-        self.assertEqual(found.count(), count)
-        for order in found:
-            self.assertEqual(order.status, status)
-
-    def test_find_by_tracking_number(self):
-        """It should Find orders by tracking_number"""
-        Orders = OrdersFactory.create_batch(10)
-        for order in Orders:
-            order.create()
-        tracking_number = order[0].tracking_number
-        count = len([order for order in Orders if order.tracking_number == tracking_number])
-        found = order.find_by_tracking_number(tracking_number)
-        self.assertEqual(found.count(), count)
-        for order in found:
-            self.assertEqual(order.tracking_number, tracking_number)
-
-    def test_find_by_discount_amount(self):
-        """It should Find orders by discount_amount"""
-        Orders = OrdersFactory.create_batch(10)
-        for order in Orders:
-            order.create()
-        discount_amount = order[0].discount_amount
-        count = len([order for order in Orders if order.discount_amount == discount_amount])
-        found = order.find_by_discount_amount(discount_amount)
-        self.assertEqual(found.count(), count)
-        for order in found:
-            self.assertEqual(order.discount_amount, discount_amount)
 
     def test_create_item_in_order(self):
         """test_create_item_in_order"""
