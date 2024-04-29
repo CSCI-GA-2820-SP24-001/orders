@@ -20,8 +20,8 @@ Scenario: The server is running
 # CREATE A ORDER
 Scenario: Create a order
     When I visit the "Home Page"
-    And I set the "Order User ID" to "10"
-    And I press the "Create order" button
+    And I set the "Customer ID" to "10"
+    And I press the "Create" button
     Then I should see the message "Success"
 
 # LIST ALL ORDERS
