@@ -12,6 +12,7 @@ RUN python -m pip install --upgrade pip poetry && \
 
 # Copy the application contents
 COPY service/ ./service/
+COPY wsgi.py/ ./wsgi.py
 
 # Switch to a non-root user and set file ownership
 RUN useradd --uid 1001 flask && \
@@ -19,7 +20,7 @@ RUN useradd --uid 1001 flask && \
 USER flask
 
 # Expose any ports the app is expecting in the environment
-ENV FLASK_APP=service:app
+ENV FLASK_APP=wsgi:app
 ENV PORT 8080
 EXPOSE $PORT
 
