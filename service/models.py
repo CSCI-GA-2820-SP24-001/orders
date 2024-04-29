@@ -210,7 +210,7 @@ class Orders(db.Model):
         return cls.query.filter_by(order_date=order_date).all()
 
     @classmethod
-    def find_by_status(cls, status: str = "pending") -> list:
+    def find_by_status(cls, order_status: str) -> list:
         """Returns all Orders by their status
 
         :param status: values are ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned', 'refunded']
@@ -220,8 +220,8 @@ class Orders(db.Model):
         :rtype: list
 
         """
-        logger.info("Processing status query for %s ...", status)
-        return cls.query.filter_by(status=status).all()
+        logger.info("Processing status query for %s ...", order_status)
+        return cls.query.filter_by(status=order_status).all()
     
     @classmethod
     def find_by_tracking_number(cls, tracking_number: str) -> list:
