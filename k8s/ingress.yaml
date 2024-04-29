@@ -1,18 +1,13 @@
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+kind: Route
+apiVersion: route.openshift.io/v1
 metadata:
   name: orders
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
-  rules:
-  - http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: orders
-            port:
-              number: 8080
+  to:
+    kind: Service
+    name: orders
+    weight: 100
+  port:
+    targetPort: 8080-tcp
+  wildcardPolicy: None
