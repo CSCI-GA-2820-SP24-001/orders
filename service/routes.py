@@ -192,7 +192,7 @@ def list_orders():
     orders = []
 
     # Parse any arguments from the query string
-    customer_id = request.args.get("customer_id",type=int)
+    customer_id = request.args.get("customer_id", type=int)
     order_date = request.args.get("order_date")
     order_status = request.args.get("status")
     tracking_number = request.args.get("tracking_number")
@@ -221,7 +221,7 @@ def list_orders():
     results = [order.serialize() for order in orders]
     app.logger.info("[%s] Orders returned", len(results))
     response = jsonify(results)
-    response.status_code =  status.HTTP_200_OK
+    response.status_code = status.HTTP_200_OK
     return response
 
 
@@ -282,6 +282,7 @@ def update_item_in_order(order_id, item_id):
     response.status_code = 200
     return response
 
+
 @app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["DELETE"])
 def delete_item_from_order(order_id, item_id):
     """
@@ -301,6 +302,7 @@ def delete_item_from_order(order_id, item_id):
     response = jsonify({"message": "Item successfully deleted"})
     response.status_code = 200
     return response
+
 
 @app.route("/orders/<int:order_id>/ship", methods=["PUT"])
 def ship_order(order_id):

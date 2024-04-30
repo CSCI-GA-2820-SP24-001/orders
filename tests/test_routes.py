@@ -375,7 +375,6 @@ class TestRoutesService(TestCase):
     # TEST ACTIONS
     # ----------------------------------------------------------
 
-
     def test_delete_order_item(self):
         """test_delete_order_item"""
         # Create a new order
@@ -422,7 +421,7 @@ class TestRoutesService(TestCase):
         """test_health"""
         resp = self.client.get("/health")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-    
+
     def test_ui(self):
         """test_ui"""
         resp = self.client.get("/ui")
@@ -446,7 +445,7 @@ class TestRoutesService(TestCase):
         self.assertEqual(len(resp.json), 1)
         # check the data just to be sure
         self.assertEqual(resp.json[0]["customer_id"], 1)
-        
+
     def test_query_by_order_date(self):
         """test_query_by_order_date"""
         # Create some orders
@@ -495,7 +494,7 @@ class TestRoutesService(TestCase):
         resp = self.client.get("/orders?tracking_number=bbbbbbb")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp.json), 1)
-        
+
     def test_query_by_discount_amount(self):
         """test_query_by_discount_amount"""
         # Create some orders
@@ -511,14 +510,14 @@ class TestRoutesService(TestCase):
         resp = self.client.get("/orders?discount_amount=10.0")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp.json), 1)
-    
+
     def test_ship_order(self):
         """test_ship_order"""
         # Create a new order
         resp = self.client.post("/orders", json={"customer_id": 1})
         order_id = resp.json["order_id"]
-        
-        resp = self.client.put(f"/orders/{order_id}/ship",json={})
+
+        resp = self.client.put(f"/orders/{order_id}/ship", json={})
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
         # Ship the order

@@ -13,6 +13,7 @@ DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
 )
 
+
 class TestOrdersModel(TestCase):
     """TestOrdersModel"""
 
@@ -158,7 +159,7 @@ class TestOrdersModel(TestCase):
             order.create()
         amount = Orders.get_all_orders_amount()
         self.assertEqual(amount, 5)
-        
+
     def test_find_by_customer_id(self):
         """test_find_by_customer_id"""
         test_orders = OrdersFactory.create_batch(10)
@@ -208,6 +209,7 @@ class TestOrdersModel(TestCase):
             order.create()
         found = Orders.find_by_discount_amount(discount_amount)
         self.assertEqual(len(found), count)
+
 
 class TestOrderItemsModel(TestCase):
     """TestOrderItemsModel"""
