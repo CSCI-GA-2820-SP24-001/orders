@@ -109,12 +109,12 @@ Scenario: Read Orders
     When I visit the "Home Page"
     And I press the "Clear" button
     And I set the "Customer ID" to "1001"
-    And I press the "Read" button
+    And I press the "Search" button
     Then I should see the message "Success"
     And I should see "1001" in the "Customer ID" field
     When I copy the "Order ID" field
     And I press the "Clear" button
     And I paste the "Order ID" field
-    And I press the "Read" button
+    And I press the "Retrieve" button
     Then I should see the message "Success"
     And I should see "1001" in the "Customer ID" field
