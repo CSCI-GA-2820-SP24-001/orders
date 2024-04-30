@@ -13,6 +13,8 @@ DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
 )
 
+# pylint: disable="too-many-public-methods"
+
 
 class TestOrdersModel(TestCase):
     """TestOrdersModel"""
