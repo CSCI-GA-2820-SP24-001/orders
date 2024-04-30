@@ -1,18 +1,3 @@
----
-kind: Route
-apiVersion: route.openshift.io/v1
-metadata:
-  name: orders
-spec:
-  to:
-    kind: Service
-    name: orders
-    weight: 100
-  port:
-    targetPort: 8080-tcp
-  wildcardPolicy: None
-
----
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
