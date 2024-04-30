@@ -179,7 +179,6 @@ class Orders(db.Model):
         """Gets a count of all orders in the database"""
         logger.info("Getting all orders amount ...")
         return cls.query.count()
-    
 
     @classmethod
     def find_by_customer_id(cls, customer_id: int) -> list:
@@ -222,7 +221,7 @@ class Orders(db.Model):
         """
         logger.info("Processing status query for %s ...", order_status)
         return cls.query.filter_by(status=order_status).all()
-    
+
     @classmethod
     def find_by_tracking_number(cls, tracking_number: str) -> list:
         """Returns an Order by its tracking_number
@@ -236,7 +235,7 @@ class Orders(db.Model):
         """
         logger.info("Processing tracking_number query for %s ...", tracking_number)
         return cls.query.filter_by(tracking_number=tracking_number).all()
-    
+
     @classmethod
     def find_by_discount_amount(cls, discount_amount: float) -> list:
         """Returns all Pets by their discount amount
@@ -347,7 +346,6 @@ class OrderItems(db.Model):
         """Returns all OrderItems with the given order ID"""
         logger.info("Processing order query for %s ...", order_id)
         return cls.query.filter(cls.order_id == order_id).all()
-    
 
     @classmethod
     def create_item(cls, order_id, item_data):
